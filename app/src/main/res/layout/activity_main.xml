@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f1f3f5"
+    tools:context=".MainActivity">
+
+        <RelativeLayout
+            android:id="@+id/main_rl_webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+         </RelativeLayout>
+        <TextView
+            android:id="@+id/main_tv_error"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:drawableTop="@drawable/page_error"
+            android:drawablePadding="10dp"
+            android:text="加载失败，请联系管理员！"
+            android:textColor="#333333"
+            android:textSize="34sp"/>
+
+    <TextView
+        android:id="@+id/main_tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#eee"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"/>
+
+
+</RelativeLayout>

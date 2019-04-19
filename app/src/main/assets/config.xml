@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <webUrl>http://192.168.1.114:8000/</webUrl><!--服务地址-->
+    <downLoadUrl>http://192.168.1.114:8000/update_apk</downLoadUrl><!--升级apk接口配置-->
+</config>
