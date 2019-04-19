@@ -15,6 +15,7 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
+        tools:replace="android:icon,android:theme,android:allowBackup"
         android:name=".base.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/logo_start"

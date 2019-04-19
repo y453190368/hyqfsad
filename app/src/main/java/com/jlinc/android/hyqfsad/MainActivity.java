@@ -1,14 +1,11 @@
 package com.jlinc.android.hyqfsad;
 
-import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bigkoo.alertview.AlertView;
-import com.bigkoo.alertview.OnItemClickListener;
 import com.jlinc.android.hyqfsad.MVP.contract.UpgradeApkContract;
 import com.jlinc.android.hyqfsad.MVP.presenter.UpgradeApkPresenter;
 import com.jlinc.android.hyqfsad.base.BaseActivity;
@@ -22,11 +19,13 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.File;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, UpgradeApkPresenter> implements UpgradeApkContract.View {
     private RelativeLayout relativeLayout;
-    private TextView textView, tvVersion;
+    private TextView textView, tvVersion,tvErrorMsg;
     private AgentWeb agentWeb;
-    private AlertView alertView;
+    private SweetAlertDialog dialog;
 
     @Override
     protected void setContentView() {
@@ -54,32 +53,25 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
 
     @Override
     public void initView() {
-        alertView = new AlertView("提示",
-                "您确定要退出排队屏显么？",
-                "取消",
-                null,
-                new String[]{"确定"},
-                this,
-                AlertView.Style.Alert,
-                new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Object o, int position) {
-                        switch (position){
-                            case 0:
-                                finish();
-                                System.exit(0);
-                                break;
-                        }
-                    }
-                });
+        dialog = new SweetAlertDialog(this,SweetAlertDialog.WARNING_TYPE);
+
         relativeLayout = findViewById(R.id.main_rl_webView);
         textView = findViewById(R.id.main_tv_error);
+        tvErrorMsg = findViewById(R.id.main_tv_errorMsg);
         tvVersion = findViewById(R.id.main_tv_version);
         agentWeb = AgentWeb.with(this)
                 .setAgentWebParent(relativeLayout, new RelativeLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
                 .setMainFrameErrorView(R.layout.web_error_page,-1)//加载异常的时候显示的页面
-                .setWebViewClient(new MyWebViewClient(this))
+                .setWebViewClient(new MyWebViewClient(this, new MyWebViewClient.OnServiceErrListener() {
+                    @Override
+                    public void setServiceErrShow(boolean isShow) {
+                        if (isShow)
+                            tvErrorMsg.setText("");
+                        else
+                            tvErrorMsg.setText(R.string.service_error_page);
+                    }
+                }))
                 .createAgentWeb()
                 .ready()
                 .go(XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML));
@@ -119,17 +111,20 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
 
         if (netWorkState){
             initData();
+            tvErrorMsg.setText("");
             agentWeb.getUrlLoader().reload();
+        }else{
+            tvErrorMsg.setText(R.string.app_net_error);
         }
     }
 
     @Override
     public boolean onKeyWebDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && !agentWeb.back()) {
-            if (alertView.isShowing() && alertView != null){
-                alertView.dismiss();
+            if (dialog.isShowing() && dialog != null){
+                dialog.dismiss();
             }else{
-                alertView.show();
+                showDialog();
             }
             return true;
         }else{
@@ -137,6 +132,27 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
         }
     }
 
+    private void showDialog(){
+        dialog.setContentText("您确定要退出么")
+                .setCancelText("取消")
+                .setConfirmText("确定")
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        setStatusAndNavBar();
+                        dialog.dismiss();
+                    }
+                })
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        dialog.dismiss();
+                        MainActivity.this.finish();
+                        System.exit(0);
+                    }
+                }).show();
+    }
 
     @Override
     public void onResult(String code, String url) {

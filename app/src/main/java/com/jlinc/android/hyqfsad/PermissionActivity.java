@@ -6,15 +6,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 
-import com.bigkoo.alertview.AlertView;
-import com.bigkoo.alertview.OnItemClickListener;
 import com.jlinc.android.hyqfsad.base.BaseActivity;
 import com.jlinc.android.hyqfsad.utils.ConstantUtils;
 import com.jlinc.android.hyqfsad.utils.FileHelper;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.functions.Consumer;
+
+//import com.bigkoo.alertview.AlertView;
+//import com.bigkoo.alertview.OnDismissListener;
+//import com.bigkoo.alertview.OnItemClickListener;
 
 /**
  * 一次性获取权限
@@ -22,7 +25,7 @@ import io.reactivex.functions.Consumer;
 public class PermissionActivity extends BaseActivity {
 
     private RxPermissions rxPermissions;
-    private String [] permissionStr = {Manifest.permission.READ_EXTERNAL_STORAGE,
+    private String[] permissionStr = {Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
     private int count = 0;
@@ -46,40 +49,37 @@ public class PermissionActivity extends BaseActivity {
                     @Override
                     public void accept(Permission permission) throws Exception {
                         count++;
-                        if (permission.granted){
-                            if (count == permissionStr.length){
-                                if (FileHelper.SDCardState()){
+                        if (permission.granted) {
+                            if (count == permissionStr.length) {
+                                if (FileHelper.SDCardState()) {
                                     FileHelper.createSDDir(ConstantUtils.QUEUINGFILES);
-                                    FileHelper.copyAssetsXmlTo(PermissionActivity.this,ConstantUtils.QUEUINGFILE_CONFIG_XML);
+                                    FileHelper.copyAssetsXmlTo(PermissionActivity.this, ConstantUtils.QUEUINGFILE_CONFIG_XML);
                                 }
                                 Intent intent = new Intent();
-                                intent.setClass(PermissionActivity.this,MainActivity.class);
+                                intent.setClass(PermissionActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             }
-                        }else{
+                        } else {
                             //拒绝权限并选择不在询问，前往app设置开启权限
-                            new AlertView("警告",
-                                    "您拒绝了" + permission.name + "权限访问，部分功能无法正常使用，请到设置页面手动授权",
-                                    "取消",
-                                    null,
-                                    new String[]{"设置"},
-                                    PermissionActivity.this,
-                                    AlertView.Style.Alert,
-                                    new OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick(Object o, int position) {
-                                            switch (position){
-                                                case 0:
-                                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                                    Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
-                                                    intent.setData(uri);
-                                                    startActivity(intent);
-                                                    finish();
-                                                    break;
+                            if (count == permissionStr.length) {
+                                new SweetAlertDialog(PermissionActivity.this, SweetAlertDialog.WARNING_TYPE)
+                                        .setContentText("您已禁止权限，请手动开启")
+                                        .setConfirmText("开启")
+                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                            @Override
+                                            public void onClick(SweetAlertDialog sDialog) {
+                                                sDialog.dismiss();
+                                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                                Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
+                                                intent.setData(uri);
+                                                startActivity(intent);
+                                                finish();
                                             }
-                                        }
-                                    }).show();
+                                        })
+                                        .show();
+
+                            }
                         }
                     }
                 });

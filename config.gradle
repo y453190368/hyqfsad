@@ -9,7 +9,7 @@ ext {
                     "agentWeb"     : "com.just.agentweb:agentweb:4.0.2",
                     "statusbar"    : "com.jaeger.statusbarutil:library:1.5.1",
                     "rxpermissions": "com.github.tbruyelle:rxpermissions:0.10.2",
-                    "alertview"    : "com.bigkoo:alertview:1.0.3",
+                    "sweetalert"     : "com.github.f0ris.sweetalert:library:1.5.1",
                     //腾讯bugly异常上报
                     "bugly"        : "com.tencent.bugly:crashreport_upgrade:latest.release",
                     "okgo"         : "com.lzy.net:okgo:3.0.4",
