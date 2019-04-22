@@ -23,7 +23,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, UpgradeApkPresenter> implements UpgradeApkContract.View {
     private RelativeLayout relativeLayout;
-    private TextView textView, tvVersion,tvErrorMsg;
+    private TextView tvVersion, tvErrorMsg;
     private AgentWeb agentWeb;
     private SweetAlertDialog dialog;
 
@@ -35,17 +35,6 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
     @Override
     public void initData() {
         tvVersion.setText(CommonUtils.getVersionName(this));
-        if (!CommonUtils.isNetworkAvailable(this)) {
-            if (FileHelper.isFileExist(ConstantUtils.QUEUINGFILE_DEFH5_ERROR)) {
-                agentWeb.getUrlLoader().loadUrl(ConstantUtils.SDHTML + ConstantUtils.QUEUINGFILE_DEFH5_ERROR);
-            } else {
-                relativeLayout.setVisibility(View.GONE);
-                textView.setVisibility(View.VISIBLE);
-            }
-        }else{
-            relativeLayout.setVisibility(View.VISIBLE);
-            textView.setVisibility(View.GONE);
-        }
         mPresenter.upgradeApk();
 
     }
@@ -53,25 +42,16 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
 
     @Override
     public void initView() {
-        dialog = new SweetAlertDialog(this,SweetAlertDialog.WARNING_TYPE);
+        dialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
 
         relativeLayout = findViewById(R.id.main_rl_webView);
-        textView = findViewById(R.id.main_tv_error);
         tvErrorMsg = findViewById(R.id.main_tv_errorMsg);
         tvVersion = findViewById(R.id.main_tv_version);
         agentWeb = AgentWeb.with(this)
                 .setAgentWebParent(relativeLayout, new RelativeLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
-                .setMainFrameErrorView(R.layout.web_error_page,-1)//加载异常的时候显示的页面
-                .setWebViewClient(new MyWebViewClient(this, new MyWebViewClient.OnServiceErrListener() {
-                    @Override
-                    public void setServiceErrShow(boolean isShow) {
-                        if (isShow)
-                            tvErrorMsg.setText("");
-                        else
-                            tvErrorMsg.setText(R.string.service_error_page);
-                    }
-                }))
+                .setMainFrameErrorView(R.layout.web_error_page, -1)//加载异常的时候显示的页面
+                .setWebViewClient(new MyWebViewClient(this))
                 .createAgentWeb()
                 .ready()
                 .go(XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML));
@@ -109,11 +89,10 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
     @Override
     public void onNetChanged(boolean netWorkState) {
 
-        if (netWorkState){
-            initData();
+        if (netWorkState) {
             tvErrorMsg.setText("");
             agentWeb.getUrlLoader().reload();
-        }else{
+        } else {
             tvErrorMsg.setText(R.string.app_net_error);
         }
     }
@@ -121,18 +100,18 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
     @Override
     public boolean onKeyWebDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && !agentWeb.back()) {
-            if (dialog.isShowing() && dialog != null){
+            if (dialog.isShowing() && dialog != null) {
                 dialog.dismiss();
-            }else{
+            } else {
                 showDialog();
             }
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private void showDialog(){
+    private void showDialog() {
         dialog.setContentText("您确定要退出么")
                 .setCancelText("取消")
                 .setConfirmText("确定")
@@ -157,7 +136,7 @@ public class MainActivity extends BaseActivity<UpgradeApkContract.Presenter, Upg
     @Override
     public void onResult(String code, String url) {
         if (!code.equals(CommonUtils.getVersionCode(this))) {
-            mPresenter.downloadApk(XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML)+url);
+            mPresenter.downloadApk(XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML) + url);
         }
     }
 

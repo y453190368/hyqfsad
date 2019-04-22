@@ -22,7 +22,7 @@ public class MyApplication extends Application {
 
     private void initOkGo() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(10000, TimeUnit.MILLISECONDS);
+        builder.connectTimeout(1000, TimeUnit.MILLISECONDS);
         OkGo.getInstance().init(this)
         .setOkHttpClient(builder.build());
     }

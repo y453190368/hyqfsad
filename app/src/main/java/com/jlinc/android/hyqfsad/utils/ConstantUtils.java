@@ -25,4 +25,10 @@ public class ConstantUtils {
     public static String CONFIG_WEBURL = "webUrl";//xml中weburl
 
     public static String CONFIG_DOWNLOADURL = "downLoadUrl";//xml中下载链接
+
+    public static String CONFIG_ISSERVICE = "isService";//服务地址是否有效
+
+    public static String CONFIG_SERVICENAME = "serviceName";//服务地址是否有效
+
+    public static String CONFIG_PORT = "port";//端口号
 }

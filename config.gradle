@@ -3,8 +3,8 @@ ext {
                applicationId    : "com.jlinc.android.hyqfsad",
                minSdkVersion    : 15,
                targetSdkVersion : 28,
-               versionCode      : 10020025,
-               versionName      : "v1.0.0.20025"]
+               versionCode      : 10010027,
+               versionName      : "v1.0.0.10027"]
     dependencies = ["appcompat-v7" : "com.android.support:appcompat-v7:28.0.0",
                     "agentWeb"     : "com.just.agentweb:agentweb:4.0.2",
                     "statusbar"    : "com.jaeger.statusbarutil:library:1.5.1",

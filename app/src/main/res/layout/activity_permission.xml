@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PermissionActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/permis_tv_error"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:drawableTop="@drawable/page_error"
+        android:drawablePadding="10dp"
+        android:text="@string/net_error_page"
+        android:textColor="#333333"
+        android:textSize="34sp"/>
+
+</RelativeLayout>

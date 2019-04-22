@@ -25,7 +25,6 @@ public class MyWebViewClient extends WebViewClient {
     private Context context;
     private Handler handler;
     private WebView webView;
-    private OnServiceErrListener onServiceErrListener;
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -38,16 +37,14 @@ public class MyWebViewClient extends WebViewClient {
         }
     };
 
-    public MyWebViewClient(Context context,OnServiceErrListener onServiceErrListener) {
+    public MyWebViewClient(Context context) {
         this.context = context;
-        this.onServiceErrListener = onServiceErrListener;
         handler = new Handler();
     }
     @Override
     public void onReceivedError(final WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
         webView = view;
-        onServiceErrListener.setServiceErrShow(false);
         handler.post(runnable);
     }
 
@@ -57,7 +54,6 @@ public class MyWebViewClient extends WebViewClient {
     public void onReceivedError(final WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
         webView = view;
-        onServiceErrListener.setServiceErrShow(false);
         handler.post(runnable);
     }
 
@@ -71,7 +67,6 @@ public class MyWebViewClient extends WebViewClient {
             Log.e(TAG, "favicon.ico 请求错误" + errorResponse.getStatusCode() + errorResponse.getReasonPhrase());
         } else {
             webView = view;
-            onServiceErrListener.setServiceErrShow(false);
             handler.post(runnable);
         }
         super.onReceivedHttpError(view, request, errorResponse);
@@ -123,7 +118,6 @@ public class MyWebViewClient extends WebViewClient {
             @Override
             public void onSuccess(Response<String> response) {
                 webView.reload();
-                onServiceErrListener.setServiceErrShow(true);
                 Toast.makeText(context,"连接成功，欢迎使用！",Toast.LENGTH_SHORT).show();
                 handler.removeCallbacks(runnable);
             }
@@ -135,7 +129,4 @@ public class MyWebViewClient extends WebViewClient {
         });
     }
 
-    public interface OnServiceErrListener{
-        void setServiceErrShow(boolean isShow);
-    }
 }

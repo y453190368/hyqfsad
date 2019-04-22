@@ -36,13 +36,13 @@ public class FileHelper {
 
     /**
      * 在SD卡上创建目录
-     * @param dirName
-     *         要创建的目录名
+     *
+     * @param dirName 要创建的目录名
      * @return 创建得到的目录
      */
     public static void createSDDir(String... dirName) {
-        for (String str:dirName){
-            if (!FileHelper.isFileExist(str)){
+        for (String str : dirName) {
+            if (!FileHelper.isFileExist(str)) {
                 File dir = new File(SDPATH + str);
                 dir.mkdir();
             }
@@ -53,8 +53,8 @@ public class FileHelper {
 
     /**
      * 判断文件是否已经存在
-     * @param fileName
-     *         要检查的文件名
+     *
+     * @param fileName 要检查的文件名
      * @return boolean, true表示存在，false表示不存在
      */
 
@@ -69,12 +69,14 @@ public class FileHelper {
      * 删除单个文件
      */
 
-    /** 删除单个文件
+    /**
+     * 删除单个文件
+     *
      * @param filePathName 要删除的文件的文件名
      * @return 单个文件删除成功返回true，否则返回false
      */
     public static boolean deleteSingleFile(String filePathName) {
-        File file = new File(SDPATH+filePathName);
+        File file = new File(SDPATH + filePathName);
         // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
@@ -94,27 +96,25 @@ public class FileHelper {
      * copy assets中的xml文件到sd卡对应目录
      */
 
-    public static void copyAssetsXmlTo(Context context, String str){
-//        for (String str:xmlStrs){
-            File file = new File(FileHelper.SDCardPath() + str);
-            if (!FileHelper.isFileExist(str) || file.length() == 0) {
-                String[] sstr = str.split("/");
-                try {
-                    InputStream is = context.getAssets().open(sstr[sstr.length-1]);
-                    FileOutputStream fos = new FileOutputStream(file);
-                    byte[] buffer = new byte[1024];
-                    int byteCount = 0;
-                    while ((byteCount = is.read(buffer)) != -1) {// 循环从输入流读取
-                        // buffer字节
-                        fos.write(buffer, 0, byteCount);// 将读取的输入流写入到输出流
-                    }
-                    fos.flush();// 刷新缓冲区
-                    is.close();
-                    fos.close();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+    public static void copyAssetsXmlTo(Context context, String str) {
+        File file = new File(FileHelper.SDCardPath() + str);
+//        if (!FileHelper.isFileExist(str) || file.length() == 0) {
+            String[] sstr = str.split("/");
+            try {
+                InputStream is = context.getAssets().open(sstr[sstr.length - 1]);
+                FileOutputStream fos = new FileOutputStream(file);
+                byte[] buffer = new byte[1024];
+                int byteCount = 0;
+                while ((byteCount = is.read(buffer)) != -1) {// 循环从输入流读取
+                    // buffer字节
+                    fos.write(buffer, 0, byteCount);// 将读取的输入流写入到输出流
                 }
+                fos.flush();// 刷新缓冲区
+                is.close();
+                fos.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 //        }
     }

@@ -24,7 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.util.Enumeration;
 import java.util.UUID;
 
 public class CommonUtils {
@@ -150,6 +155,7 @@ public class CommonUtils {
      * 有root权限
      * 静默安装apk
      * 《《如果本地versionCode高于服务器的versionCode时，静默安装失败》》
+     *
      * @param apkPath
      * @return
      */
@@ -279,19 +285,58 @@ public class CommonUtils {
 
     /**
      * get App versionName
+     *
      * @param context
      * @return
      */
-    public static String getVersionName(Context context){
-        PackageManager packageManager=context.getPackageManager();
+    public static String getVersionName(Context context) {
+        PackageManager packageManager = context.getPackageManager();
         PackageInfo packageInfo;
-        String versionName="";
+        String versionName = "";
         try {
-            packageInfo=packageManager.getPackageInfo(context.getPackageName(),0);
-            versionName=packageInfo.versionName;
+            packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         return versionName;
+    }
+
+    /**
+     * @return String
+     * @Title: getIpAddress
+     * @Description: 获取设备ip地址
+     */
+    public static String getIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> enNetI = NetworkInterface.getNetworkInterfaces();
+                 enNetI.hasMoreElements(); ) {
+                NetworkInterface netI = enNetI.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = netI.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * 获取IP前缀
+     * @return
+     */
+    public static String getLocAddrIndex(){
+
+        String str = getIpAddress();
+
+        if(!str.equals("")){
+            return str.substring(0,str.lastIndexOf(".")+1);
+        }
+
+        return null;
     }
 }
