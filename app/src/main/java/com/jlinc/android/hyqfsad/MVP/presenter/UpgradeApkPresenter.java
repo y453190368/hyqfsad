@@ -3,6 +3,7 @@ package com.jlinc.android.hyqfsad.MVP.presenter;
 import com.google.gson.Gson;
 import com.jlinc.android.hyqfsad.MVP.contract.UpgradeApkContract;
 import com.jlinc.android.hyqfsad.bean.UploadApkBean;
+import com.jlinc.android.hyqfsad.utils.CommonUtils;
 import com.jlinc.android.hyqfsad.utils.ConstantUtils;
 import com.jlinc.android.hyqfsad.utils.FileHelper;
 import com.jlinc.android.hyqfsad.utils.XmlUtils;
@@ -34,21 +35,31 @@ public class UpgradeApkPresenter extends UpgradeApkContract.Presenter {
      */
     @Override
     public void upgradeApk() {
-
-        OkGo.<String>get(XmlUtils.getValue(ConstantUtils.CONFIG_DOWNLOADURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML))
+        String downLoadUrl = XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML) +
+                XmlUtils.getValue(ConstantUtils.CONFIG_DOWNLOADURL, FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_XML);
+        OkGo.<String>get(downLoadUrl)
                 .tag(this)
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
                         try {
+                            //服务连接成功，将config.xml文件copy做备份
+                            File file = new File(FileHelper.SDCardPath() + ConstantUtils.QUEUINGFILE_CONFIG_BACKUP);
+                            if (FileHelper.isFileExist(ConstantUtils.QUEUINGFILE_CONFIG_BACKUP) && file.length() != 0 &&
+                                    (!XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL,FileHelper.SDCardPath()+ConstantUtils.QUEUINGFILE_CONFIG_BACKUP_XML)
+                                            .equals(XmlUtils.getValue(ConstantUtils.CONFIG_WEBURL,FileHelper.SDCardPath()+ConstantUtils.QUEUINGFILE_CONFIG_XML))||
+                                    !XmlUtils.getValue(ConstantUtils.CONFIG_PORT,FileHelper.SDCardPath()+ConstantUtils.QUEUINGFILE_CONFIG_BACKUP_XML)
+                                            .equals(XmlUtils.getValue(ConstantUtils.CONFIG_PORT,FileHelper.SDCardPath()+ConstantUtils.QUEUINGFILE_CONFIG_XML)))){
+                                FileHelper.copyFile(ConstantUtils.QUEUINGFILE_CONFIG_XML, ConstantUtils.QUEUINGFILE_CONFIG_BACKUP_XML);
+                            }
                             JSONObject object = new JSONObject(response.body());
-                            if (object!=null){
+                            if (object != null) {
                                 String data = object.getString("data");
                                 Gson gson = new Gson();
-                                UploadApkBean uploadApkBean = gson.fromJson(data,UploadApkBean.class);
-                                mView.onResult(uploadApkBean.getVer(),uploadApkBean.getApk_path());
-                            }else{
-                                CrashReport.postException(0,"请求接口","请求接口内容返回空",null,null);
+                                UploadApkBean uploadApkBean = gson.fromJson(data, UploadApkBean.class);
+                                mView.onUpgradeApk(uploadApkBean.getVer(), uploadApkBean.getApk_path());
+                            } else {
+                                CrashReport.postException(0, "请求接口", "请求接口内容返回空", null, null);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -66,10 +77,12 @@ public class UpgradeApkPresenter extends UpgradeApkContract.Presenter {
 
     /**
      * 下载apk
+     *
      * @param url
      */
     @Override
     public void downloadApk(String url) {
+
         if (FileHelper.isFileExist(ConstantUtils.QUEUINGFILE_APK + "/" + ConstantUtils.QUEUINGFILE_APKNAME)) {
             FileHelper.deleteSingleFile(ConstantUtils.QUEUINGFILE_APK + "/" + ConstantUtils.QUEUINGFILE_APKNAME);
         }

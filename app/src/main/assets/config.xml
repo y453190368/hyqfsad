@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
-    <webUrl>http://192.168.1.114:8000/</webUrl><!--服务地址-->
-    <port>1050</port>
-    <downLoadUrl>http://192.168.1.114:8000/update_apk</downLoadUrl><!--升级apk接口配置-->
-    <isService>isValidConnectService.php</isService><!--服务是否有效-->
+    <webUrl>http://192.168.1.68:8000/</webUrl><!--服务地址-->
+    <port>8000</port>
+    <downLoadUrl>update_apk</downLoadUrl><!--升级apk接口配置-->
+    <isService>isValidConnectService</isService><!--服务是否有效-->
     <serviceName>hyqfsad1</serviceName><!--排队服务名-->
+    <copyConfig>10010031</copyConfig><!--判断配置文件是否有变动-->
+
+    <adminCmd>221344</adminCmd><!--管理员操作-->
+
 
 </config>

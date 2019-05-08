@@ -9,7 +9,7 @@ public interface UpgradeApkContract {
 
     interface View extends IBaseView {
 
-        void onResult(String versionCode,String url);
+        void onUpgradeApk(String versionCode,String url);
 
         void onDownLoadApk(File file);
     }

@@ -7,7 +7,6 @@
     <string name="service_net_error">服务器网络异常</string>
 
 
-
     <!--异常页面提示文本-->
     <string name="net_error_page">请检查您的网络连接。</string>
     <string name="service_error_page">Web服务异常,请联系管理员。</string>

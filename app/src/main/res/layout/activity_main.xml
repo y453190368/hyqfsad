@@ -13,18 +13,6 @@
             >
 
          </RelativeLayout>
-        <!--<TextView-->
-            <!--android:id="@+id/main_tv_error"-->
-            <!--android:visibility="gone"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_centerInParent="true"-->
-            <!--android:gravity="center"-->
-            <!--android:drawableTop="@drawable/page_error"-->
-            <!--android:drawablePadding="10dp"-->
-            <!--android:text="@string/net_error_page"-->
-            <!--android:textColor="#333333"-->
-            <!--android:textSize="34sp"/>-->
 
     <TextView
         android:id="@+id/main_tv_version"
@@ -44,4 +32,5 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"/>
+
 </RelativeLayout>

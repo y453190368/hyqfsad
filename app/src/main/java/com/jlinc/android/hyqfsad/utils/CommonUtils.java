@@ -6,15 +6,19 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.WindowManager;
 
 import com.tencent.bugly.crashreport.CrashReport;
+import com.ys.myapi.MyManager;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -103,18 +107,25 @@ public class CommonUtils {
     /**
      * 隐藏虚拟按键，并且全屏
      */
-    public static void hideBottomUIMenu(Activity activity) {
-        //隐藏虚拟按键，并且全屏
-        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
-            View v = activity.getWindow().getDecorView();
-            v.setSystemUiVisibility(View.GONE);
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            //for new api versions.
-            View decorView = activity.getWindow().getDecorView();
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
+    public static void hideBottomUIMenu(Activity activity,MyManager manager) {
+
+        if (manager.getAndroidDisplay().contains("rk3368_box")){//判断设备固件系统版本中是否包含
+            manager.hideNavBar(false);
+            manager.setSlideShowNavBar(true);
+            manager.setSlideShowNotificationBar(true);
+        }else {
+            //隐藏虚拟按键，并且全屏
+            if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
+                View v = activity.getWindow().getDecorView();
+                v.setSystemUiVisibility(View.GONE);
+            } else if (Build.VERSION.SDK_INT >= 19) {
+                //for new api versions.
+                View decorView = activity.getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
+            }
         }
     }
 
@@ -149,69 +160,6 @@ public class CommonUtils {
             e.printStackTrace();
         }
         return bool;
-    }
-
-    /**
-     * 有root权限
-     * 静默安装apk
-     * 《《如果本地versionCode高于服务器的versionCode时，静默安装失败》》
-     *
-     * @param apkPath
-     * @return
-     */
-    public static void silentInstallRoot(String apkPath) {
-        DataOutputStream dataOutputStream = null;
-        BufferedReader errorStream = null;
-        BufferedReader successStream = null;
-        Process process = null;
-        try {
-            // 申请 su 权限
-            process = Runtime.getRuntime().exec("su");
-            dataOutputStream = new DataOutputStream(process.getOutputStream());
-            // 执行 pm install 命令
-            String command = "pm install -r " + apkPath + "\n";
-            dataOutputStream.write(command.getBytes(Charset.forName("UTF-8")));
-            dataOutputStream.writeBytes("exit\n");
-            dataOutputStream.flush();
-            process.waitFor();
-            errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            StringBuilder errorMsg = new StringBuilder();
-            String line;
-            while ((line = errorStream.readLine()) != null) {
-                errorMsg.append(line);
-            }
-            Log.i("CommonUtils error", errorMsg.toString());
-            StringBuilder successMsg = new StringBuilder();
-            successStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            // 读取命令执行结果
-            while ((line = successStream.readLine()) != null) {
-                successMsg.append(line);
-            }
-            Log.i("CommonUtils success", successMsg.toString());
-            // 如果执行结果中包含 Failure 字样就认为是操作失败，否则就认为安装成功
-            if (!(errorMsg.toString().contains("Failure") || successMsg.toString().contains("Failure"))) {
-                CrashReport.postException(0, "已root静默安装", "静默安装失败", null, null);
-            }
-        } catch (Exception e) {
-            Log.e("CommonUtils Exception", e.getMessage());
-        } finally {
-            try {
-                if (process != null) {
-                    process.destroy();
-                }
-                if (dataOutputStream != null) {
-                    dataOutputStream.close();
-                }
-                if (errorStream != null) {
-                    errorStream.close();
-                }
-                if (successStream != null) {
-                    successStream.close();
-                }
-            } catch (Exception e) {
-                Log.e("CommonUtils Exception", e.getMessage());
-            }
-        }
     }
 
     /**
@@ -338,5 +286,45 @@ public class CommonUtils {
         }
 
         return null;
+    }
+
+    /**
+     * 屏幕宽度
+     * @param context
+     * @return
+     */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public static float getScreenWidth(Context context){
+        MyManager manager = MyManager.getInstance(context);
+        int width;
+        if (manager.getAndroidDisplay().contains("rk3368_box")){//判断设备固件系统版本中是否包含
+            width = manager.getScreenWidth();
+        }else {
+            WindowManager wm = (WindowManager) (context.getSystemService(Context.WINDOW_SERVICE));
+            Point point = new Point();
+            wm.getDefaultDisplay().getRealSize(point);
+            width = point.x;
+        }
+        return (float)width;
+    }
+
+    /**
+     * 屏幕高度
+     * @param context
+     * @return
+     */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public static float getScreenHeight(Context context){
+        MyManager manager = MyManager.getInstance(context);
+        int height;
+        if (manager.getAndroidDisplay().contains("rk3368_box")){//判断设备固件系统版本中是否包含
+            height = manager.getScreenHeight();
+        }else {
+            WindowManager wm = (WindowManager) (context.getSystemService(Context.WINDOW_SERVICE));
+            Point point = new Point();
+            wm.getDefaultDisplay().getRealSize(point);
+            height = point.y;
+        }
+        return (float)height;
     }
 }
